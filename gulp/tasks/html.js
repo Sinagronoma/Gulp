@@ -11,7 +11,7 @@ export const html = () => {
       message: "Error: <%= error.message %>"
     }))
     )
-    // .pipe(fileInclude())
+     .pipe(fileInclude())
     // .pipe(pug({
     //   //Сжатие HTML файла
     //   pretty: true,
@@ -19,8 +19,15 @@ export const html = () => {
     //   verbose: true
     // }))
     .pipe(app.plugins.replace(/@img\//g, 'img/'))
-    .pipe(webpHtmlNosvg())
     .pipe(
+      app.plugins.if(
+        app.isBuild,
+        webpHtmlNosvg()
+        )
+      )
+    .pipe(
+      app.plugins.if(
+        app.isBuild,
       versionNumber({
       'value': '%DT%',
       'append': {
@@ -36,6 +43,7 @@ export const html = () => {
       }
     })
   )
+)
     .pipe(app.gulp.dest(app.path.build.html))
     .pipe(app.plugins.browsersync.stream())
 }
